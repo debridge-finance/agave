@@ -1155,6 +1155,13 @@ impl ConnectionTable {
         if has_connection_capacity {
             let exit = Arc::new(AtomicBool::new(false));
             let last_update = Arc::new(AtomicU64::new(last_update));
+<<<<<<< HEAD
+=======
+            let stream_counter = connection_entry
+                .first()
+                .map(|entry| entry.stream_counter.clone())
+                .unwrap_or(Arc::new(ConnectionStreamCounter::new()));
+>>>>>>> 0e96ea6ad8 (share the stream counter for unstaked connections as well (#962))
             connection_entry.push(ConnectionEntry::new(
                 exit.clone(),
                 stake,
