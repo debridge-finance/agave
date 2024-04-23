@@ -1,6 +1,14 @@
 use {
     crate::{
+<<<<<<< HEAD
         quic::{configure_server, QuicServerError, StreamStats, MAX_UNSTAKED_CONNECTIONS},
+=======
+        nonblocking::stream_throttle::{
+            ConnectionStreamCounter, StakedStreamLoadEMA, STREAM_THROTTLING_INTERVAL,
+            STREAM_THROTTLING_INTERVAL_MS,
+        },
+        quic::{configure_server, QuicServerError, StreamStats},
+>>>>>>> 137a982a1e (sleep instead of drop when stream rate exceeded limit; (#939))
         streamer::StakedNodes,
         tls_certificates::get_pubkey_from_tls_certificate,
     },
@@ -49,7 +57,7 @@ use {
         // introduce any other awaits while holding the RwLock.
         sync::{Mutex, MutexGuard},
         task::JoinHandle,
-        time::timeout,
+        time::{sleep, timeout},
     },
 };
 
@@ -794,6 +802,7 @@ async fn handle_connection(
         {
             match stream {
                 Ok(mut stream) => {
+<<<<<<< HEAD
                     if reset_throttling_params_if_needed(&mut last_throttling_instant) {
                         streams_in_current_interval = 0;
                     } else if streams_in_current_interval >= max_streams_per_100ms {
@@ -808,10 +817,44 @@ async fn handle_connection(
                                 stats
                                     .throttled_staked_streams
                                     .fetch_add(1, Ordering::Relaxed);
+=======
+                    let max_streams_per_throttling_interval = stream_load_ema
+                        .available_load_capacity_in_throttling_duration(
+                            params.peer_type,
+                            params.total_stake,
+                        );
+
+                    let throttle_interval_start =
+                        stream_counter.reset_throttling_params_if_needed();
+                    let streams_read_in_throttle_interval =
+                        stream_counter.stream_count.load(Ordering::Relaxed);
+                    if streams_read_in_throttle_interval >= max_streams_per_throttling_interval {
+                        // The peer is sending faster than we're willing to read. Sleep for what's
+                        // left of this read interval so the peer backs off.
+                        let throttle_duration = STREAM_THROTTLING_INTERVAL
+                            .saturating_sub(throttle_interval_start.elapsed());
+
+                        if !throttle_duration.is_zero() {
+                            debug!("Throttling stream from {remote_addr:?}, peer type: {:?}, total stake: {}, \
+                                    max_streams_per_interval: {max_streams_per_throttling_interval}, read_interval_streams: {streams_read_in_throttle_interval} \
+                                    throttle_duration: {throttle_duration:?}",
+                                    params.peer_type, params.total_stake);
+                            stats.throttled_streams.fetch_add(1, Ordering::Relaxed);
+                            match params.peer_type {
+                                ConnectionPeerType::Unstaked => {
+                                    stats
+                                        .throttled_unstaked_streams
+                                        .fetch_add(1, Ordering::Relaxed);
+                                }
+                                ConnectionPeerType::Staked(_) => {
+                                    stats
+                                        .throttled_staked_streams
+                                        .fetch_add(1, Ordering::Relaxed);
+                                }
+>>>>>>> 137a982a1e (sleep instead of drop when stream rate exceeded limit; (#939))
                             }
+                            sleep(throttle_duration).await;
                         }
-                        let _ = stream.stop(VarInt::from_u32(STREAM_STOP_CODE_THROTTLING));
-                        continue;
                     }
                     streams_in_current_interval = streams_in_current_interval.saturating_add(1);
                     stats.total_streams.fetch_add(1, Ordering::Relaxed);
