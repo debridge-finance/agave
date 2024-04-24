@@ -2710,9 +2710,9 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "libc"
-version = "0.2.144"
+version = "0.2.153"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b00cc1c228a6782d0f076e7b232802e0c5689d41bb5df366f2a6b6621cfdfe1"
+checksum = "9c198f91728a82281a64e1f4f9eeb25d82cb32a5de251c6bd1b5154d63a8e7bd"
 
 [[package]]
 name = "libloading"
@@ -2946,6 +2946,16 @@ name = "mime"
 version = "0.3.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a60c7ce501c71e03a9c9c0d35b861413ae925bd979cc7a4e30d060069aaac8d"
+
+[[package]]
+name = "mime_guess"
+version = "2.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4192263c238a5f0d0c6bfd21f336a313a4ce1c450542449ca191bb657b4642ef"
+dependencies = [
+ "mime",
+ "unicase",
+]
 
 [[package]]
 name = "min-max-heap"
@@ -4285,6 +4295,7 @@ dependencies = [
  "js-sys",
  "log",
  "mime",
+ "mime_guess",
  "native-tls",
  "once_cell",
  "percent-encoding 2.2.0",
@@ -4305,6 +4316,21 @@ dependencies = [
  "web-sys",
  "webpki-roots",
  "winreg",
+]
+
+[[package]]
+name = "reqwest-middleware"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a735987236a8e238bf0296c7e351b999c188ccc11477f311b82b55c93984216"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "http",
+ "reqwest",
+ "serde",
+ "task-local-extensions",
+ "thiserror",
 ]
 
 [[package]]
@@ -4886,9 +4912,9 @@ checksum = "9def91fd1e018fe007022791f865d0ccc9b3a0d5001e01aabb8b40e46000afb5"
 
 [[package]]
 name = "smallvec"
-version = "1.7.0"
+version = "1.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ecab6c735a6bb4139c0caafd0cc3635748bbb3acf4550e8138122099251f309"
+checksum = "3c5e1a9a646d36c3599cd173a41282daf47c44583ad367b8e6837255952e5c67"
 
 [[package]]
 name = "smpl_jwt"
@@ -6475,6 +6501,7 @@ dependencies = [
  "jsonrpc-http-server",
  "log",
  "reqwest",
+ "reqwest-middleware",
  "semver 1.0.17",
  "serde",
  "serde_derive",
@@ -6496,6 +6523,7 @@ dependencies = [
  "bs58",
  "jsonrpc-core",
  "reqwest",
+ "reqwest-middleware",
  "semver 1.0.17",
  "serde",
  "serde_derive",
@@ -7553,9 +7581,9 @@ dependencies = [
 
 [[package]]
 name = "sync_wrapper"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "20518fe4a4c9acf048008599e464deb21beeae3d3578418951a189c235a7a9a8"
+checksum = "2047c6ded9c721764247e62cd3b03c09ffc529b2ba5b10ec482ae507a4a70160"
 
 [[package]]
 name = "synstructure"
@@ -7650,6 +7678,15 @@ dependencies = [
  "proc-macro2 1.0.76",
  "quote 1.0.28",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "task-local-extensions"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ba323866e5d033818e3240feeb9f7db2c4296674e4d9e16b97b7bf8f490434e8"
+dependencies = [
+ "pin-utils",
 ]
 
 [[package]]
