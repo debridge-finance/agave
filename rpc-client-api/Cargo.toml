@@ -14,6 +14,7 @@ base64 = { workspace = true }
 bs58 = { workspace = true }
 jsonrpc-core = { workspace = true }
 reqwest = { workspace = true, features = ["blocking", "brotli", "deflate", "gzip", "rustls-tls", "json"] }
+reqwest-middleware = { workspace = true }
 semver = { workspace = true }
 serde = { workspace = true }
 serde_derive = { workspace = true }

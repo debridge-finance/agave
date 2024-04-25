@@ -27,7 +27,7 @@ use {
 };
 
 pub struct HttpSender {
-    client: Arc<reqwest::Client>,
+    client: Arc<reqwest_middleware::ClientWithMiddleware>,
     url: String,
     request_id: AtomicU64,
     stats: RwLock<RpcTransportStats>,
@@ -57,16 +57,55 @@ impl HttpSender {
         );
 
         let client = Arc::new(
-            reqwest::Client::builder()
-                .default_headers(default_headers)
-                .timeout(timeout)
-                .pool_idle_timeout(timeout)
-                .build()
-                .expect("build rpc client"),
+            reqwest_middleware::ClientBuilder::new(
+                reqwest::Client::builder()
+                    .default_headers(default_headers)
+                    .timeout(timeout)
+                    .pool_idle_timeout(timeout)
+                    .build()
+                    .expect("build rpc client"),
+            )
+            .build(),
         );
 
         Self {
             client,
+            url: url.to_string(),
+            request_id: AtomicU64::new(0),
+            stats: RwLock::new(RpcTransportStats::default()),
+        }
+    }
+    /// Create an HTTP RPC sender.
+    ///
+    /// Most flexible way to create a sender. Pass a created `reqwest::Client`.
+    pub fn new_with_client<U: ToString>(url: U, client: reqwest::Client) -> Self {
+        Self {
+            client: Arc::new(reqwest_middleware::ClientBuilder::new(client).build()),
+            url: url.to_string(),
+            request_id: AtomicU64::new(0),
+            stats: RwLock::new(RpcTransportStats::default()),
+        }
+    }
+
+    /// Create default headers used by HTTP Sender.
+    pub fn default_headers() -> header::HeaderMap {
+        let mut default_headers = header::HeaderMap::new();
+        default_headers.append(
+            header::HeaderName::from_static("solana-client"),
+            header::HeaderValue::from_str(
+                format!("rust/{}", solana_version::Version::default()).as_str(),
+            )
+            .unwrap(),
+        );
+        default_headers
+    }
+
+    /// Create an HTTP RPC sender.
+    ///
+    /// Most flexible way to create a sender. Pass a created `reqwest_middleware::ClientWithMiddleware`.
+    pub fn new_with_client_with_middleware<U: ToString>(url: U, client: reqwest_middleware::ClientWithMiddleware) -> Self {
+        Self {
+            client: Arc::new(client),
             url: url.to_string(),
             request_id: AtomicU64::new(0),
             stats: RwLock::new(RpcTransportStats::default()),
